@@ -30,13 +30,17 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 extra-source-files:
 - README.md
-- ChangeLog.md
 
 # The library contains all of our application code. The executable
 # defined below is just a thin wrapper.
 library:
   source-dirs: src
   dependencies:
+  - base
+  - semigroupoids
+  - invariant
+  - newtype
+  - natural-transformation
   - mtl
   - transformers
   - profunctors
@@ -91,13 +95,13 @@ library:
   - ExplicitNamespaces
 
 # Test suite
-tests:
-  ps-codec-test:
-    main:                Spec.hs
-    source-dirs:         test
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - ps-codec
+# tests:
+#   ps-codec-test:
+#     main:                Spec.hs
+#     source-dirs:         test
+#     ghc-options:
+#     - -threaded
+#     - -rtsopts
+#     - -with-rtsopts=-N
+#     dependencies:
+#     - ps-codec
