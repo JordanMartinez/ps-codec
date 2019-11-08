@@ -1,4 +1,7 @@
-
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE UnicodeSyntax #-}
+{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE TypeOperators #-}
 module Data.Codec where
 
 import Prelude
