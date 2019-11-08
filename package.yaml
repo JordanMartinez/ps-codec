@@ -1,0 +1,103 @@
+# For an explanation on each field below, see
+# https://www.haskell.org/cabal/users-guide/cabal-projectindex.html#cap-package.cabal%20fields
+#
+# hpack simply makes this less boilerplatey and simpler to write.
+
+# Project - Essentials
+name:                ps-codec
+version:             0.1.0.0
+
+# Project - Metadata
+github:              "jordanmartinez/ps-codec"
+license:             BSD3
+#license-file
+# ^ Defaults to `LICENSE` if file exists
+author:              "Author name here"
+maintainer:          "example@example.com"
+# ^ defaults to author if blank
+copyright:           "2019 Author name here"
+
+# Project- Metadata used when publishing package
+# synopsis:            Short description of your package
+# category:            Web
+
+# stability:
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/githubuser/foo#readme>
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# The library contains all of our application code. The executable
+# defined below is just a thin wrapper.
+library:
+  source-dirs: src
+  dependencies:
+  - mtl
+  - transformers
+  - profunctors
+  # Make developer experience similar to PureScript
+  ghc-options:
+  - -Wall
+  - -Wincomplete-uni-patterns
+  - -Wincomplete-record-updates
+  - -Wmissing-export-lists
+  - -Widentities
+  - -Wredundant-constraints
+  - -Wpartial-fields
+  - -Wcompat
+  - -fprint-expanded-synonyms
+  - -fprint-explicit-foralls
+  - -ferror-spans
+  - -fwarn-tabs
+
+  # Make developer experience similar to PureScript
+  default-extensions:
+  - KindSignatures
+  - LiberalTypeSynonyms
+  - EmptyDataDecls
+  - OverloadedLists
+  - OverloadedStrings
+  - NumericUnderscores
+  - NegativeLiterals
+  - MultiParamTypeClasses
+  - ConstrainedClassMethods
+  - FlexibleInstances
+  - FlexibleContexts
+  - FunctionalDependencies
+  - ConstraintKinds
+  - InstanceSigs
+  - DeriveFunctor
+  - DeriveFoldable
+  - DeriveTraversable
+  - GeneralizedNewtypeDeriving
+  - DerivingVia
+  - MonoLocalBinds
+  - PatternGuards
+  - ScopedTypeVariables
+  - RankNTypes
+  - LambdaCase
+  - BlockArguments
+  - TypeApplications
+  - RecordWildCards
+  - NamedFieldPuns
+  - ApplicativeDo
+  - BangPatterns
+  - PartialTypeSignatures
+  - ExplicitNamespaces
+
+# Test suite
+tests:
+  ps-codec-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - ps-codec

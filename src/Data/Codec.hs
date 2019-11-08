@@ -1,3 +1,4 @@
+
 module Data.Codec where
 
 import Prelude
