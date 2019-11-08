@@ -36,7 +36,7 @@ import Control.Monad (MonadPlus)
 -- invmapFunctor in Haskell is iMapF in PureScript
 import Data.Functor.Invariant (Invariant, invmap, invmapFunctor)
 -- import Data.Newtype (un)
-import Control.Newtype (Newtype, op)
+-- Decided to use `unStar` since Star doesn't have a Newtype instance
 -- import Data.Profunctor (class Profunctor, dimap, lcmap)
 -- import Data.Profunctor.Star (Star(..))
 import Data.Profunctor (Profunctor, dimap, Star(..))
@@ -46,21 +46,6 @@ import Data.Functor.Bind as Bind ((>>-), Bind)
 import Control.Category as C
 import Data.Semigroupoid (Semigroupoid, o)
 import Control.Natural (type (~>))
-
--- Orphan instances for `Star`
-instance Newtype (Star n a b) (a -> n b)
-
-instance (Apply.Apply n) ⇒ Apply.Apply (Star n a) where
-  (<.>) (Star x) (Star y) = Star (\a -> x a <.> y a)
-
-instance (Bind.Bind n) ⇒ Bind.Bind (Star n a) where
-  (>>-) (Star m) f = Star (\x -> m x >>- \a -> case f a of Star g -> g x)
-
-instance (Alt n) ⇒ Alt (Star n a) where
-  (<!>) (Star f) (Star g) = Star (\a -> f a <!> g a)
-
-instance (Plus n) ⇒ Plus (Star n a) where
-  zero = Star \_ -> zero
 
 -- -- | A general type for codecs.
 -- data GCodec m n a b = GCodec (m b) (Star n a b)
@@ -85,7 +70,9 @@ instance (Functor m, Functor n) ⇒ Invariant (GCodec m n a) where
 
 instance (Apply.Apply m, Apply.Apply n) ⇒ Apply.Apply (GCodec m n a) where
   (<.>) (GCodec decf encf) (GCodec decx encx) =
-    GCodec (decf <.> decx) (encf <.> encx)
+    GCodec (decf <.> decx) (encf `starApply` encx)
+    where
+      starApply (Star x) (Star y) = Star (\a -> x a <.> y a)
 
 -- instance applicativeGCodec ∷ (Applicative m, Applicative n) ⇒ Applicative (GCodec m n a) where
 --   pure x =
@@ -104,7 +91,10 @@ instance (Applicative m, Applicative n) ⇒ Applicative (GCodec m n a) where
 
 instance (Bind.Bind m, Bind.Bind n) ⇒ Bind.Bind (GCodec m n a) where
   (>>-) (GCodec dec enc) f =
-    GCodec (dec >>- (f C.>>> decoder)) (enc >>- (f C.>>> encoder))
+    GCodec (dec >>- (f C.>>> decoder)) (enc `starBind` (f C.>>> encoder))
+    where
+      starBind (Star m) f' = Star \x -> 
+        m x >>- \a -> case f' a of Star g -> g x
 
 -- instance monadGCodec ∷ (Monad m, Monad n) ⇒ Monad (GCodec m n a)
 
@@ -128,13 +118,15 @@ instance (Functor m, Functor n) ⇒ Profunctor (GCodec m n) where
 
 instance (Alt m, Alt n) ⇒ Alt (GCodec m n a) where
   (<!>) (GCodec decx encx) (GCodec decy ency) =
-    GCodec (decx <!> decy) (encx <!> ency)
+    GCodec (decx <!> decy) (encx `starAlt` ency)
+    where
+      starAlt (Star f) (Star g) = Star (\a -> f a <!> g a)
 
 -- instance plusGCodec ∷ (Plus m, Plus n) ⇒ Plus (GCodec m n a) where
 --   empty = GCodec empty empty
 
 instance (Plus m, Plus n) ⇒ Plus (GCodec m n a) where
-  zero = GCodec zero zero
+  zero = GCodec zero (Star \_ -> zero)
 
 -- instance alternativeGCodec ∷ (Alternative m, Alternative n) ⇒ Alternative (GCodec m n a)
 
@@ -197,7 +189,7 @@ decode = runReaderT C.<<< decoder
 
 encode ∷ ∀ m a b c d. Codec m a b c d → c → b
 -- encode codec = execWriter <<< un Star (encoder codec)
-encode codec = execWriter C.<<< op Star (encoder codec)
+encode codec = execWriter C.<<< unStar (encoder codec)
 
 mapCodec
   ∷ ∀ m a b c d
@@ -211,7 +203,7 @@ mapCodec f g (GCodec decf encf) = GCodec dec enc
   where
   dec = ReaderT \x → f =<< runReaderT decf x
   enc = Star \a →
-    let (_, x) = runWriter (op Star encf (g a))
+    let (_, x) = runWriter (unStar encf (g a))
     in writer (a, x)
 
 composeCodec
@@ -225,8 +217,8 @@ composeCodec (GCodec decf encf) (GCodec decg encg) =
   GCodec
     (ReaderT \x → runReaderT decf =<< runReaderT decg x)
     (Star \c →
-      let (w, x) = runWriter (op Star encf c)
-      in writer $ (w, (execWriter (op Star encg x))))
+      let (w, x) = runWriter (unStar encf c)
+      in writer $ (w, (execWriter (unStar encg x))))
 
 (<~<) ∷ ∀ a d f b e c m
       . Monad m
@@ -264,3 +256,7 @@ type BasicCodec m a b = Codec m a a b b
 basicCodec ∷ ∀ m a b. (a → m b) → (b → a) → BasicCodec m a b
 -- basicCodec f g = GCodec (ReaderT f) (Star \x → writer $ Tuple x (g x))
 basicCodec f g = GCodec (ReaderT f) (Star \x → writer (x, (g x)))
+
+-- Deal with Star not having a Newtype instance
+unStar :: ∀ f d c. Star f d c -> (d -> f c)
+unStar (Star f) = f
