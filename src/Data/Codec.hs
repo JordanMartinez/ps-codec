@@ -19,7 +19,10 @@ module Data.Codec
   , basicCodec
   ) where
 
-import Prelude
+-- import Prelude
+import Control.Applicative (Applicative, pure, (<*>))
+import Data.Function (($), flip)
+-- See 'import Control.Monad' line
 
 -- import Control.Alternative (Alt, Alternative, Plus, empty, (<|>))
 import Control.Applicative (Alternative, (<|>), empty)
@@ -31,7 +34,7 @@ import Control.Monad.Reader (ReaderT(..), mapReaderT, runReaderT)
 import Control.Monad.Trans.Writer.Strict (Writer, writer, execWriter, runWriter)
 -- import Control.MonadPlus (class MonadPlus)
 -- import Control.MonadZero (class MonadZero)
-import Control.Monad (MonadPlus)
+import Control.Monad (Functor, fmap, Monad, (>>=), return, (=<<), MonadPlus)
 -- import Data.Functor.Invariant (class Invariant, imapF)
 -- invmapFunctor in Haskell is iMapF in PureScript
 import Data.Functor.Invariant (Invariant, invmap, invmapFunctor)
