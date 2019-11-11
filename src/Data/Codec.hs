@@ -93,8 +93,8 @@ instance (Bind.Bind m, Bind.Bind n) ⇒ Bind.Bind (GCodec m n a) where
   (>>-) (GCodec dec enc) f =
     GCodec (dec >>- (f C.>>> decoder)) (enc `starBind` (f C.>>> encoder))
     where
-      starBind (Star m) f' = Star \x -> 
-        m x >>- \a -> case f' a of Star g -> g x
+      starBind (Star m) f' = Star
+        \x -> m x >>- \a -> case f' a of Star g -> g x
 
 -- instance monadGCodec ∷ (Monad m, Monad n) ⇒ Monad (GCodec m n a)
 
