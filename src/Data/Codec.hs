@@ -53,7 +53,7 @@ import Control.Natural (type (~>))
 -- -- | A general type for codecs.
 -- data GCodec m n a b = GCodec (m b) (Star n a b)
 -- | A general type for codecs.
-data GCodec m n a b = GCodec (m b) (Star n a b)
+data GCodec m n a b = GCodec !(m b) !(Star n a b)
 
 -- instance functorGCodec ∷ (Functor m, Functor n) ⇒ Functor (GCodec m n a) where
 --   map f (GCodec dec enc) =
