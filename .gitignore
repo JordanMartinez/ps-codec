@@ -1,9 +1,2 @@
-/.*
-!/.gitignore
-!/.travis.yml
-/bower_components/
-/node_modules/
-/output/
-package-lock.json
-
 ps-codec.cabal
+.stack-work
