@@ -1,16 +1,5 @@
-# purescript-codec
+# ps-codec
 
-[![Latest release](http://img.shields.io/github/release/garyb/purescript-codec.svg)](https://github.com/garyb/purescript-codec/releases)
-[![Build Status](https://travis-ci.org/garyb/purescript-codec.svg?branch=master)](https://travis-ci.org/garyb/purescript-codec)
+A port of [purescript-codec](https://github.com/garyb/purescript-codec), which is based on [codec](https://github.com/chpatrick/codec), back to Haskell.
 
 General purpose bi-directional codecs.
-
-## Installation
-
-```
-bower install purescript-codec
-```
-
-## Documentation
-
-Module documentation is [published on Pursuit](http://pursuit.purescript.org/packages/purescript-codec).
